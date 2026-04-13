@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neon Clicker Game</title>
+
+<style>
+body {
+  font-family: Arial;
+  text-align: center;
+  background: radial-gradient(circle at top, #0f0f0f, #000);
+  color: #0ff;
+  margin: 0;
+}
+
+h1 {
+  margin-top: 20px;
+  font-size: 3rem;
+  text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+}
+
+#score {
+  font-size: 2rem;
+  margin: 10px;
+}
+
+#perClick, #auto {
+  margin: 5px;
+}
+
+button {
+  padding: 15px 25px;
+  margin: 10px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: scale(1.1);
+}
+
+#clickBtn {
+  background: #0ff;
+}
+
+#upgradeBtn {
+  background: #f0f;
+  color: white;
+}
+
+#autoBtn {
+  background: #ff0;
+  color: black;
+}
+</style>
+</head>
+
+<body>
+
+<h1>⚡ NEON CLICKER ⚡</h1>
+
+<div id="score">Score: 0</div>
+<div id="perClick">Per Click: 1</div>
+<div id="auto">Auto Clickers: 0</div>
+
+<button id="clickBtn">CLICK</button><br>
+<button id="upgradeBtn">Upgrade Click | Cost: 10</button>
+<button id="autoBtn">Buy Auto Clicker | Cost: 50</button>
+
+<audio id="clickSound" src="https://www.myinstants.com/media/sounds/mouse-click.mp3"></audio>
+
+<script>
+let score = 0;
+let perClick = 1;
+let upgradeCost = 10;
+let autoClickers = 0;
+let autoCost = 50;
+
+const scoreDisplay = document.getElementById("score");
+const perClickDisplay = document.getElementById("perClick");
+const autoDisplay = document.getElementById("auto");
+
+const clickBtn = document.getElementById("clickBtn");
+const upgradeBtn = document.getElementById("upgradeBtn");
+const autoBtn = document.getElementById("autoBtn");
+
+const clickSound = document.getElementById("clickSound");
+
+function loadGame() {
+  const save = JSON.parse(localStorage.getItem("clickerSave"));
+  if (save) {
+    score = save.score || 0;
+    perClick = save.perClick || 1;
+    upgradeCost = save.upgradeCost || 10;
+    autoClickers = save.autoClickers || 0;
+    autoCost = save.autoCost || 50;
+  }
+}
+
+function saveGame() {
+  localStorage.setItem("clickerSave", JSON.stringify({
+    score, perClick, upgradeCost, autoClickers, autoCost
+  }));
+}
+
+clickBtn.onclick = () => {
+  score += perClick;
+  clickSound.currentTime = 0;
+  clickSound.play();
+  updateUI();
+  saveGame();
+};
+
+upgradeBtn.onclick = () => {
+  if (score >= upgradeCost) {
+    score -= upgradeCost;
+    perClick++;
+    upgradeCost = Math.floor(upgradeCost * 1.6);
+    updateUI();
+    saveGame();
+  }
+};
+
+autoBtn.onclick = () => {
+  if (score >= autoCost) {
+    score -= autoCost;
+    autoClickers++;
+    autoCost = Math.floor(autoCost * 1.8);
+    updateUI();
+    saveGame();
+  }
+};
+
+setInterval(() => {
+  score += autoClickers;
+  updateUI();
+  saveGame();
+}, 1000);
+
+function updateUI() {
+  scoreDisplay.textContent = "Score: " + score;
+  perClickDisplay.textContent = "Per Click: " + perClick;
+  autoDisplay.textContent = "Auto Clickers: " + autoClickers;
+
+  upgradeBtn.textContent = `Upgrade Click | Cost: ${upgradeCost}`;
+  autoBtn.textContent = `Buy Auto Clicker | Cost: ${autoCost}`;
+}
+
+loadGame();
+updateUI();
+</script>
+
+</body>
+</html>
